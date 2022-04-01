@@ -9,6 +9,7 @@ from win32com.server.exception import COMException
 
 
 class MainTimer:
+    times = {}
 
     def __init__(self, apps=[], wmi_apps=[]):
         self.apps = apps
@@ -20,13 +21,15 @@ class MainTimer:
             self.apps.append(proc.GetWindowThreadProcessId(hwnd)[1])
         #print(self.apps)
 
-
+    def window_bounds(self, hwnd, extra):
+        if gui.IsWindowVisible(hwnd):
+            print(gui.GetClientRect(hwnd))
 
 if __name__ == "__main__":
 
     m = MainTimer()
     # somehow enumwindows passes all the handlers into the func
-
+    gui.EnumWindows(m.window_bounds, None)
 
    # m.wmi_get_process(foreProc)
    #
@@ -38,6 +41,27 @@ if __name__ == "__main__":
             if p.pid == foreProc:
                 print(p.info)
         print(time.localtime())
+
+"""
+Checklist - 
+declare current resolution width and height as static vars
+
+Check if Window in foreground:
+    if window is on either left side or right side, detect dual split windows and find matching window
+        Take time for both windows
+    if windows in either corners, detect corner windows
+        Take time for all current visible windows
+        
+    if ANY OTHER window size state (full screen, partial screen)
+        Take time for current foreground window
+        
+    Save to times
+    Every x seconds, call update method that writes times to json/csv
+    
+    All good
+    
+"""
+
 
 
 
