@@ -10,6 +10,8 @@ from win32com.server.exception import COMException
 
 class MainTimer:
     times = {}
+    WINDOW_WIDTH = 1920
+    WINDOW_HEIGHT = 1200
 
     def __init__(self, apps=[], wmi_apps=[]):
         self.apps = apps
@@ -31,8 +33,6 @@ if __name__ == "__main__":
     # somehow enumwindows passes all the handlers into the func
     gui.EnumWindows(m.window_bounds, None)
 
-   # m.wmi_get_process(foreProc)
-   #
     for i in range(100):
         time.localtime()
         gui.EnumWindows(m.get_processes, None)
@@ -49,6 +49,8 @@ declare current resolution width and height as static vars
 Check if Window in foreground:
     if window is on either left side or right side, detect dual split windows and find matching window
         Take time for both windows
+        - use getwindowrect to see if a window's upper left is the dual split coordinate
+        - WARNING - dual split coordinates are different depending if the window is the foreground window or not""
     if windows in either corners, detect corner windows
         Take time for all current visible windows
         
@@ -65,6 +67,5 @@ Check if Window in foreground:
 
 
 
-    # 8 second time difference - bbng
 # oiaefnoaesnfae
 #bfas;ehf ioasefb aesf
