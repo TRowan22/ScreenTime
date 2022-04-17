@@ -8,14 +8,21 @@ from win32com.server.exception import COMException
 # import psutil
 
 
+class PullTimes:
+    def __init__(self, days):
+        self.days = days
+
+
 class MainTimer:
-    times = {}
     WINDOW_WIDTH = 1920
     WINDOW_HEIGHT = 1200
 
     def __init__(self, apps=[], wmi_apps=[]):
         self.apps = apps
         self.wmi_apps = wmi_apps
+        self.currentDay = 17
+        self.corners = {1080: (1536, 824), 1200: (1536, 920)}  # which tuple of pixels corresponds to a full screen window
+        # each display size - 1440p, 4K, ultrawide need to be added
 
     def get_processes(self, hwnd, extra):
         if gui.IsWindowVisible(hwnd):
@@ -23,9 +30,9 @@ class MainTimer:
             self.apps.append(proc.GetWindowThreadProcessId(hwnd)[1])
         #print(self.apps)
 
-    def window_bounds(self, hwnd, extra):
+    def window_bounds(self, hwnd, extra=None):
         if gui.IsWindowVisible(hwnd):
-            print(gui.GetClientRect(hwnd))
+            print(hwnd, gui.GetClientRect(hwnd))
 
 if __name__ == "__main__":
 
@@ -40,6 +47,7 @@ if __name__ == "__main__":
         for p in util.process_iter(['pid', 'name']):
             if p.pid == foreProc:
                 print(p.info)
+                print(gui.GetClientRect(gui.GetForegroundWindow()))
         print(time.localtime())
 
 """
