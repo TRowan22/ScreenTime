@@ -1,24 +1,24 @@
 import win32process as proc
 import win32gui as gui
-import time as time
 import psutil as util
-import json
 import datetime
+import jsonutils as jsutils
 import os
-import win32pdh as pdh
-from win32com.server.exception import COMException
-
-# import psutil
 
 
 class TimesStruct:
     def __init__(self):
-        self.times = {}
+        """
+        Finds the path of the week file that contains the current date
+        If path is not a file yet, create it
+        Else read the data from it
+        """
+        self.path = jsutils.find_current_path()
 
-        current = datetime.date.today()
-        current = current + datetime.timedelta(days=-current.weekday(), weeks=0)
-        file = str(current) + ".json"
-        self.path = rf"C:\Users\tsrow\PycharmProjects\ScreenTime\data\{file}"
+        if os.path.isfile(self.path):
+            self.times = jsutils.read(self.path)
+        else:
+            self.add()
 
     # add program
     def add(self):
@@ -28,13 +28,9 @@ class TimesStruct:
         :return:
         """
 
-        with open(self.path, 'w') as writefile:
-            writefile.seek(0)
-            json.dump({}, writefile, indent=4)
-
-        with open(self.path, 'r') as outfile:
-            outfile.seek(0)
-            self.times = json.load(outfile)
+        jsutils.write(self.path, {})
+        self.times = jsutils.read(self.path)
+        self.create_app("RunningTotal")
 
     def update(self, name):
         """
@@ -60,9 +56,7 @@ class TimesStruct:
         self.times.update({name: new_dict})
 
     def send_to_json(self):
-        with open(self.path, 'w') as writefile:
-            writefile.seek(0)
-            json.dump(self.times, writefile, indent=4)
+        jsutils.write(self.path, self.timess)
 
 
 class MainTimer:
@@ -86,58 +80,15 @@ class MainTimer:
         fore_proc = proc.GetWindowThreadProcessId(gui.GetForegroundWindow())[1]
         for p in util.process_iter(['pid', 'name']):
             if p.pid == fore_proc and not self.startSecond == current_second:
-                print(p.info)
                 name = p.name()[0].upper() + p.name()[1:-4]
-                print(name)
                 self.timer.update(name)
+                self.timer.update("RunningTotal")
                 self.startSecond = datetime.datetime.now().second
-
-    def get_processes(self, hwnd, extra):
-        if gui.IsWindowVisible(hwnd):
-            # print(f'Window Id: {proc.GetWindowThreadProcessId(hwnd)[0]}, Window Name: {gui.GetWindowText(hwnd)}')
-            self.apps.append(proc.GetWindowThreadProcessId(hwnd)[1])
-        #print(self.apps)
-
-    """
-    def window_bounds(self, hwnd, extra=None):
-        if gui.IsWindowVisible(hwnd):
-            print(hwnd, gui.GetClientRect(hwnd))
-    """
 
 
 if __name__ == "__main__":
     m = MainTimer()
-    # somehow enumwindows passes all the handlers into the func
-    ##gui.EnumWindows(m.window_bounds, None)
+
     for i in range(1, 10):
         m.get_current_window()
     m.timer.send_to_json()
-
-
-# print(gui.GetClientRect(gui.GetForegroundWindow()))
-"""
-Checklist - 
-
-Check if Window in foreground:
-    if window is on either left side or right side, detect dual split windows and find matching window
-        Take time for both windows
-        - use getwindowrect to see if a window's upper left is the dual split coordinate
-        - WARNING - dual split coordinates are different depending if the window is the foreground window or not""
-    if windows in either corners, detect corner windows
-        Take time for all current visible windows
-        
-    if ANY OTHER window size state (full screen, partial screen)
-        Take time for current foreground window
-        
-    Save to times
-    Every x seconds, call update method that writes times to json/csv
-    
-    All good
-    
-"""
-
-
-
-
-# oiaefnoaesnfae
-#bfas;ehf ioasefb aesf

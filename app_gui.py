@@ -15,6 +15,9 @@ from PyQt5.QtCore import *
 
 
 class MainWindow(QWidget):
+    """
+    The main widget as a container for all other widgets
+    """
     def __init__(self):
         super().__init__()
         self.WINDOW_WIDTH = int(1920 / 4)
@@ -94,6 +97,9 @@ class CurrentWD(QWidget):
 
 
 class CurrentGraph(QWidget):
+    """
+    Contains the current graph according to button presses
+    """
     def __init__(self):
         super().__init__()
         self.timer = wt.MainTimer()
@@ -102,6 +108,24 @@ class CurrentGraph(QWidget):
     def initUI(self):
         current = QHBoxLayout()
 
+
+class AppInfo(QWidget):
+    """
+    Contains a single app's name and it's time
+    """
+    def __init__(self, name, time):
+        super().__init__()
+        self.name = name
+        self.time = time
+
+        h = QHBoxLayout()
+        app = QLabel(name, self)
+        time = QLabel(time, self)
+        time.setAlignment(Qt.AlignRight)
+
+        h.addWidget(app)
+        h.addWidget(time)
+        h.setContentsMargins(0, 0, 0, 0)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
