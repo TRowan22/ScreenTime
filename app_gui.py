@@ -9,16 +9,16 @@ List of apps          Time Spent
 import sys
 import calendar
 from PyQt5.QtWidgets import QVBoxLayout, QMainWindow, QApplication, QLabel, QWidget, \
-    QPushButton, QLineEdit, QHBoxLayout, QDockWidget
-from PyQt5.QtGui import QPixmap, QPalette, QIcon
-from PyQt5.QtCore import Qt
+    QPushButton, QLineEdit, QHBoxLayout, QDockWidget, QSizePolicy
+from PyQt5.QtGui import QPixmap, QPalette, QIcon, QFont
+from PyQt5.QtCore import *
 
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.WINDOW_WIDTH = int(1920 / 4)
-        self.WINDOW_HEIGHT = int(1200 / 4)
+        self.WINDOW_HEIGHT = int(1200 / 2)
 
         self.week = WeekDay(self, int(self.WINDOW_WIDTH / 2))
         self.init_app()
@@ -26,7 +26,7 @@ class MainWindow(QWidget):
 
     def init_app(self):
         self.setStyleSheet("background-color: #cecece;")
-        self.setFixedSize(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
+        self.setFixedSize(self.WINDOW_WIDTH + 30, self.WINDOW_HEIGHT)
 
 
 class WeekDay(QWidget):
@@ -36,7 +36,7 @@ class WeekDay(QWidget):
     def __init__(self, main_wind, half):
         super().__init__(main_wind)
         self.main_wind = main_wind
-        self.current = CurrentWD(main_wind)
+        self.current = CurrentWD()
         self.half = half
         self.initUI()
 
@@ -49,29 +49,50 @@ class WeekDay(QWidget):
         day = QPushButton("Day", self.main_wind)
 
         day.setStyleSheet(f"min-width: {self.half}px;")
-        day.move(self.half, 0)
 
         hbox.addWidget(week)
         hbox.addWidget(day)
 
+        hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.setSpacing(0)
+
         all_parts = QVBoxLayout()
         all_parts.addLayout(hbox)
         all_parts.addWidget(self.current)
+        all_parts.setContentsMargins(5, 5, 5, 5)
+        all_parts.setSpacing(0)
         self.setLayout(all_parts)
 
 class CurrentWD(QWidget):
-    def __init__(self , parent):
-        super().__init__(parent)
-        self.parent = parent
+    """
+    Creates class for switching days/weeks
+    """
+    def __init__(self):
+        super().__init__()
+        # self.parent = parent
         self.init_ui()
 
     def init_ui(self):
         m = QHBoxLayout()
-        label = QLabel("a", self.parent)
-        label.move(200, 0)
-        m.addWidget(label)
-        self.setLayout(m)
+        label = QPushButton("<", self)
+        label2 = QLabel("Date Date Date", self)
+        label2.setAlignment(Qt.AlignCenter)
+        label2.setFont(QFont('Arial', 12))
+        label3 = QPushButton(">", self)
 
+
+        m.addWidget(label)
+        m.addWidget(label2)
+        m.addWidget(label3)
+
+        m.setStretch(0, 10) #set stretch for relative spacings, size policy for absolute relative max and min
+        m.setStretch(1, 80)
+        m.setStretch(2, 10)
+
+
+        m.setContentsMargins(0, 0, 0, 0)
+        #m.setSpacing(0)
+        self.setLayout(m)
 
 
 class CurrentGraph(QWidget):
