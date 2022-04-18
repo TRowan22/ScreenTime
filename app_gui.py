@@ -7,7 +7,7 @@ List of apps          Time Spent
 (bar scaled by how much time spent)
 """
 import sys
-import calendar
+import window_timer as wt
 from PyQt5.QtWidgets import QVBoxLayout, QMainWindow, QApplication, QLabel, QWidget, \
     QPushButton, QLineEdit, QHBoxLayout, QDockWidget, QSizePolicy
 from PyQt5.QtGui import QPixmap, QPalette, QIcon, QFont
@@ -80,7 +80,6 @@ class CurrentWD(QWidget):
         label2.setFont(QFont('Arial', 12))
         label3 = QPushButton(">", self)
 
-
         m.addWidget(label)
         m.addWidget(label2)
         m.addWidget(label3)
@@ -88,7 +87,6 @@ class CurrentWD(QWidget):
         m.setStretch(0, 10) #set stretch for relative spacings, size policy for absolute relative max and min
         m.setStretch(1, 80)
         m.setStretch(2, 10)
-
 
         m.setContentsMargins(0, 0, 0, 0)
         #m.setSpacing(0)
@@ -98,6 +96,7 @@ class CurrentWD(QWidget):
 class CurrentGraph(QWidget):
     def __init__(self):
         super().__init__()
+        self.timer = wt.MainTimer()
         self.initUi()
 
     def initUI(self):
