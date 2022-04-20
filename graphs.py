@@ -3,6 +3,7 @@ Working on it
 """
 import matplotlib.pyplot as plt
 import jsonutils as jsutils
+import numpy as np
 import datetime
 
 one_app = {
@@ -75,7 +76,25 @@ class GraphCreator:
         plt.ylabel("Minutes spent")
         plt.show()
 
+    def create_day_test(self):
+        day = one_app["Firefox"]["0"]
+
+        hours = list(day.keys())
+        seconds = np.array(list(day.values())) / 3600
+
+        fig = plt.figure(figsize=(10, 5))
+
+        # creating the bar plot
+        plt.bar(hours, seconds, color='maroon',
+                width=0.4)
+
+        plt.xlabel("Hour")
+        plt.ylabel("Minutes spent")
+        plt.show()
+
    # def create_week(self, week):
 
 
-if __name__ == "__main__"
+if __name__ == "__main__":
+    g = GraphCreator()
+    g.create_day_test()
