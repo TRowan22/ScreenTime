@@ -56,7 +56,7 @@ class TimesStruct:
         self.times.update({name: new_dict})
 
     def send_to_json(self):
-        jsutils.write(self.path, self.timess)
+        jsutils.write(self.path, self.times)
 
 
 class MainTimer:
@@ -89,6 +89,7 @@ class MainTimer:
 if __name__ == "__main__":
     m = MainTimer()
 
-    for i in range(1, 10):
+    # add every second loop
+    for i in range(1, 5):
         m.get_current_window()
     m.timer.send_to_json()

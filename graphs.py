@@ -55,6 +55,35 @@ one_app = {
 }
 
 
+class TotalCreator:
+    """
+    Retrieves data from the running total and sends it to the GUI
+
+    get_day_total - returns array containing the total minutes spent each hour in day
+    get_week_total - returns array containing the total hours spent each day in week
+    """
+
+    def __init__(self, name):
+        self.path = jsutils.find_current_path()
+        self.data = jsutils.read(self.path)
+        self.name = name
+
+    def get_day_total(self, day):
+        app = self.data[self.name][str(day)]
+        hours = app.values()
+
+        return hours
+
+    def get_week_total(self):
+        total = []
+        for i in range(7):
+            total.append(sum(self.get_day_total(i)))
+
+        return total
+
+
+
+"""
 class GraphCreator:
     def __init__(self):
         self.path = jsutils.find_current_path()
@@ -98,3 +127,4 @@ class GraphCreator:
 if __name__ == "__main__":
     g = GraphCreator()
     g.create_day_test()
+"""

@@ -7,11 +7,13 @@ List of apps          Time Spent
 (bar scaled by how much time spent)
 """
 import sys
-
 import PyInstaller
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas)
 from matplotlib.figure import Figure
+import datetime
+
+import jsonutils
 import window_timer as wt
 import graphs as graph
 from PyQt5.QtWidgets import QVBoxLayout, QMainWindow, QApplication, QLabel, QWidget, \
@@ -56,11 +58,13 @@ class WeekDay(QWidget):
 
         week.setStyleSheet(f"min-width: {self.half}px;")
         week.setFont(QFont("Agenda One", 10))
+        week.clicked.connect(lambda: self.clicked("week"))
 
         day = QPushButton("Day", self.main_wind)
 
         day.setStyleSheet(f"min-width: {self.half}px;")
         day.setFont(QFont("Agenda One", 10))
+        day.clicked.connect(lambda: self.clicked("day"))
 
         hbox.addWidget(week)
         hbox.addWidget(day)
@@ -73,13 +77,22 @@ class WeekDay(QWidget):
         all_parts.addWidget(self.current)
         all_parts.addWidget(self.graph)
 
+        """
         for i in range(5):
             app = AppInfo("F", "F")
             all_parts.addWidget(app)
+        """
 
         all_parts.setContentsMargins(5, 5, 5, 5)
         all_parts.setSpacing(0)
         self.setLayout(all_parts)
+
+    def clicked(self, mode):
+        """
+        Function that controls what happens to the app when the week button is clicked
+        Clicked just doesn't error and returns error codes because they hate you
+        """
+        self.current.change_label(mode)
 
 
 class CurrentWD(QWidget):
@@ -89,27 +102,40 @@ class CurrentWD(QWidget):
     def __init__(self):
         super().__init__()
         # self.parent = parent
+        self.curr_date = datetime.date.today()
+        self.label = QPushButton("<", self)
+        self.label2 = QLabel('date', self)
+        self.label3 = QPushButton(">", self)
         self.init_ui()
 
     def init_ui(self):
-        m = QHBoxLayout()
-        label = QPushButton("<", self)
-        label2 = QLabel("Date Date Date", self)
-        label2.setAlignment(Qt.AlignCenter)
-        label2.setFont(QFont('Agenda One', 12))
-        label3 = QPushButton(">", self)
+        hbox = QHBoxLayout()
 
-        m.addWidget(label)
-        m.addWidget(label2)
-        m.addWidget(label3)
+        self.label2.setAlignment(Qt.AlignCenter)
+        self.label2.setFont(QFont('Agenda One', 12))
 
-        m.setStretch(0, 10) # set stretch for relative spacings, size policy for absolute relative max and min
-        m.setStretch(1, 80)
-        m.setStretch(2, 10)
+        hbox.addWidget(self.label)
+        hbox.addWidget(self.label2)
+        hbox.addWidget(self.label3)
 
-        m.setContentsMargins(0, 0, 0, 0)
+        hbox.setStretch(0, 10) # set stretch for relative spacings, size policy for absolute relative max and min
+        hbox.setStretch(1, 80)
+        hbox.setStretch(2, 10)
+
+        hbox.setContentsMargins(0, 0, 0, 0)
         #m.setSpacing(0)
-        self.setLayout(m)
+        self.setLayout(hbox)
+
+    def change_label(self, mode):
+        week_start = self.curr_date + datetime.timedelta(days=-self.curr_date.weekday(), weeks=0)
+        # week_start = self.curr_date
+
+        if mode == "day":
+            self.label2.setFont(QFont('Agenda One', 10))
+            self.label2.setText(self.curr_date.strftime("%A, %B %d, %Y"))
+        if mode == "week":
+            self.label2.setFont(QFont('Agenda One', 10))
+            self.label2.setText(f'Week of Monday, {week_start.strftime("%B %d, %Y")}')
 
 
 class CurrentGraph(QDialog):
@@ -122,7 +148,6 @@ class CurrentGraph(QDialog):
         self.figure.set_figwidth(2)
         self.figure.set_figheight(2.5)
         self.figure.set_facecolor("#cecece")
-        q = QWidget()
 
         # this is the Canvas Widget that displays the `figure`
         # it takes the `figure` instance as a parameter to __init__
