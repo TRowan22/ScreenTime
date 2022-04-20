@@ -70,7 +70,9 @@ class TotalCreator:
 
     def get_day_total(self, day):
         app = self.data[self.name][str(day)]
-        hours = app.values()
+        hours = np.array(list(app.values()))
+
+        hours = hours / 60
 
         return hours
 
@@ -80,8 +82,6 @@ class TotalCreator:
             total.append(sum(self.get_day_total(i)))
 
         return total
-
-
 
 """
 class GraphCreator:

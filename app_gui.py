@@ -101,18 +101,23 @@ class CurrentWD(QWidget):
     """
     def __init__(self):
         super().__init__()
-        # self.parent = parent
         self.curr_date = datetime.date.today()
+        self.week_start = self.curr_date + datetime.timedelta(days=-self.curr_date.weekday(), weeks=0)
+
+        self.mode = "day"
         self.label = QPushButton("<", self)
-        self.label2 = QLabel('date', self)
+        self.label2 = QLabel(self.curr_date.strftime("%A, %B %d, %Y"), self)
         self.label3 = QPushButton(">", self)
         self.init_ui()
 
     def init_ui(self):
         hbox = QHBoxLayout()
 
+        self.label.clicked.connect(lambda: self.change_by_one(False))
+        self.label3.clicked.connect(lambda: self.change_by_one(True))
+
         self.label2.setAlignment(Qt.AlignCenter)
-        self.label2.setFont(QFont('Agenda One', 12))
+        self.label2.setFont(QFont('Agenda One', 10))
 
         hbox.addWidget(self.label)
         hbox.addWidget(self.label2)
@@ -127,15 +132,28 @@ class CurrentWD(QWidget):
         self.setLayout(hbox)
 
     def change_label(self, mode):
-        week_start = self.curr_date + datetime.timedelta(days=-self.curr_date.weekday(), weeks=0)
-        # week_start = self.curr_date
+        """
+        Changes whether the label displays time by weeks or days
+        :param mode: Week mode or Day mode
+        """
+        self.curr_date = datetime.date.today()
+        self.week_start = self.curr_date + datetime.timedelta(days=-self.curr_date.weekday(), weeks=0)
 
+        self.check_mode(mode)
+
+    def change_by_one(self, forward):
+        self.curr_date = self.curr_date + datetime.timedelta(days=(1 if forward else -1))
+        self.week_start = self.week_start + datetime.timedelta(weeks=(1 if forward else -1))
+
+        self.check_mode(self.mode)
+
+    def check_mode(self, mode):
         if mode == "day":
-            self.label2.setFont(QFont('Agenda One', 10))
             self.label2.setText(self.curr_date.strftime("%A, %B %d, %Y"))
+            self.mode = "day"
         if mode == "week":
-            self.label2.setFont(QFont('Agenda One', 10))
-            self.label2.setText(f'Week of Monday, {week_start.strftime("%B %d, %Y")}')
+            self.label2.setText(f'Week of Monday, {self.week_start.strftime("%B %d, %Y")}')
+            self.mode = "week"
 
 
 class CurrentGraph(QDialog):
@@ -144,6 +162,10 @@ class CurrentGraph(QDialog):
     """
     def __init__(self):
         super().__init__()
+        self.data = graph.TotalCreator("RunningTotal")
+        self.days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
+        self.hours = range(24)
+
         self.figure = Figure()
         self.figure.set_figwidth(2)
         self.figure.set_figheight(2.5)
@@ -163,7 +185,7 @@ class CurrentGraph(QDialog):
     def plot(self):
         ''' plot some random stuff '''
         # random data
-        data = [2 for i in range(10)]
+        data = self.data.get_day_total(2)
 
         # instead of ax.hold(False)
         self.figure.clear()
@@ -175,7 +197,7 @@ class CurrentGraph(QDialog):
         # ax.hold(False) # deprecated, see above
 
         # plot data
-        ax.plot(data, '*-')
+        ax.bar(self.hours, data, color='maroon', width=0.4)
 
         # refresh canvas
         self.canvas.draw()
