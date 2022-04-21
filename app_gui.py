@@ -12,9 +12,7 @@ from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas)
 from matplotlib.figure import Figure
 import datetime
-
-import jsonutils
-import window_timer as wt
+import numpy as np
 import graphs as graph
 from PyQt5.QtWidgets import QVBoxLayout, QMainWindow, QApplication, QLabel, QWidget, \
     QPushButton, QLineEdit, QHBoxLayout, QDockWidget, QSizePolicy, QDialog
@@ -47,8 +45,8 @@ class WeekDay(QWidget):
     def __init__(self, main_wind, half):
         super().__init__(main_wind)
         self.main_wind = main_wind
-        self.current = CurrentWD()
         self.graph = CurrentGraph()
+        self.current = CurrentWD(self.graph)
         self.half = half
         self.initUI()
 
@@ -77,11 +75,9 @@ class WeekDay(QWidget):
         all_parts.addWidget(self.current)
         all_parts.addWidget(self.graph)
 
-        """
-        for i in range(5):
-            app = AppInfo("F", "F")
-            all_parts.addWidget(app)
-        """
+
+        app = AppInfo("Pycharm64")
+        all_parts.addWidget(app)
 
         all_parts.setContentsMargins(5, 5, 5, 5)
         all_parts.setSpacing(0)
@@ -99,10 +95,11 @@ class CurrentWD(QWidget):
     """
     Creates class for switching days/weeks
     """
-    def __init__(self):
-        super().__init__()
+    def __init__(self, graphP):
+        super().__init__();
         self.curr_date = datetime.date.today()
         self.week_start = self.curr_date + datetime.timedelta(days=-self.curr_date.weekday(), weeks=0)
+        self.graph = graphP
 
         self.mode = "day"
         self.label = QPushButton("<", self)
@@ -131,7 +128,7 @@ class CurrentWD(QWidget):
         #m.setSpacing(0)
         self.setLayout(hbox)
 
-    def change_label(self, mode):
+    def change_label(self, given_mode):
         """
         Changes whether the label displays time by weeks or days
         :param mode: Week mode or Day mode
@@ -139,13 +136,15 @@ class CurrentWD(QWidget):
         self.curr_date = datetime.date.today()
         self.week_start = self.curr_date + datetime.timedelta(days=-self.curr_date.weekday(), weeks=0)
 
-        self.check_mode(mode)
+        self.check_mode(given_mode)
+        self.graph.plot(given_mode, datetime.datetime.today().weekday())
 
     def change_by_one(self, forward):
         self.curr_date = self.curr_date + datetime.timedelta(days=(1 if forward else -1))
         self.week_start = self.week_start + datetime.timedelta(weeks=(1 if forward else -1))
 
         self.check_mode(self.mode)
+        self.graph.change_by_one(self.mode, forward)
 
     def check_mode(self, mode):
         if mode == "day":
@@ -154,6 +153,7 @@ class CurrentWD(QWidget):
         if mode == "week":
             self.label2.setText(f'Week of Monday, {self.week_start.strftime("%B %d, %Y")}')
             self.mode = "week"
+
 
 
 class CurrentGraph(QDialog):
@@ -165,6 +165,9 @@ class CurrentGraph(QDialog):
         self.data = graph.TotalCreator("RunningTotal")
         self.days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
         self.hours = range(24)
+        self.mode_var = "day"
+        self.curr_weekday = datetime.datetime.today().weekday()
+
 
         self.figure = Figure()
         self.figure.set_figwidth(2)
@@ -180,45 +183,62 @@ class CurrentGraph(QDialog):
         layout.addWidget(self.canvas)
         self.setLayout(layout)
 
-        self.plot()
+        self.plot(self.mode_var, self.curr_weekday)
 
-    def plot(self):
-        ''' plot some random stuff '''
+    def plot(self, mode, day):
+        """
+        :param mode: either week or day
+        Plots either the week or day
+        """
         # random data
-        data = self.data.get_day_total(2)
+        if mode == "day":
+            data = self.data.get_day_total(day)
+            x_axis = self.hours
+        if mode == "week":
+            data = self.data.get_week_total()
+            x_axis = self.days
 
-        # instead of ax.hold(False)
+        self.mode_var = mode
         self.figure.clear()
-
-        # create an axis
         ax = self.figure.add_subplot(111)
-
-        # discards the old graph
-        # ax.hold(False) # deprecated, see above
-
-        # plot data
-        ax.bar(self.hours, data, color='maroon', width=0.4)
-
-        # refresh canvas
+        ax.bar(x_axis, data, color='maroon', width=0.4)
         self.canvas.draw()
+
+    def change_by_one(self, mode, forward):
+        if mode == "day":
+            temp_week = self.curr_weekday + (1 if forward else -1)
+
+            if temp_week == 8:
+                self.curr_weekday = 0
+            elif temp_week == -1:
+                self.curr_weekday = 7
+            else:
+                self.curr_weekday = temp_week
+            print(self.curr_weekday)
+        if mode == "week":
+            self.data.set_path(self.curr_date + datetime.timedelta(days=-self.curr_date.weekday(), weeks=(1 if forward else -1)))
+        self.plot(mode, self.curr_weekday)
 
 
 class AppInfo(QWidget):
     """
     Contains a single app's name and it's time
     """
-    def __init__(self, name, time):
+    def __init__(self, name):
         super().__init__()
         self.name = name
-        self.time = time
+        self.data = graph.TotalCreator(name)
 
         h = QHBoxLayout()
         app = QPushButton(name, self)
+        app.setFont(QFont('Agenda One', 12))
         app.setFlat(True)
 
         app.setStyleSheet("text-align: left")
 
-        time = QPushButton(time, self)
+        total_time = np.sum(self.data.get_day_total(2))
+        time = QPushButton(str(int(total_time)), self)
+        time.setFont(QFont('Agenda One', 12))
         time.setFlat(True)
 
         time.setStyleSheet("text-align: right");

@@ -4,6 +4,7 @@ Working on it
 import matplotlib.pyplot as plt
 import jsonutils as jsutils
 import numpy as np
+import os
 import datetime
 
 one_app = {
@@ -69,19 +70,37 @@ class TotalCreator:
         self.name = name
 
     def get_day_total(self, day):
+        """
+        :param day: the day we wanted to check
+        :return: the hours spent on the computer during that day in an array
+        """
         app = self.data[self.name][str(day)]
         hours = np.array(list(app.values()))
 
         hours = hours / 60
+        print(hours)
 
         return hours
 
     def get_week_total(self):
+        """
+        :return: the hours spent on the computer each day in an array for a week
+        """
         total = []
         for i in range(7):
             total.append(sum(self.get_day_total(i)))
 
+        total = np.array(total) / 60
+
         return total
+
+    def set_path(self, curr_week):
+        file = str(curr_week) + ".json"
+        path = rf"C:\Users\tsrow\PycharmProjects\ScreenTime\data\{file}"
+        if os.path.isfile(path):
+            self.path = path
+        else:
+            print("File not found!")
 
 """
 class GraphCreator:
