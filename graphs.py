@@ -78,7 +78,6 @@ class TotalCreator:
         hours = np.array(list(app.values()))
 
         hours = hours / 60
-        print(hours)
 
         return hours
 
@@ -99,6 +98,7 @@ class TotalCreator:
         path = rf"C:\Users\tsrow\PycharmProjects\ScreenTime\data\{file}"
         if os.path.isfile(path):
             self.path = path
+            self.data = jsutils.read(self.path)
         else:
             print("File not found!")
 

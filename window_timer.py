@@ -90,6 +90,6 @@ if __name__ == "__main__":
     m = MainTimer()
 
     # add every second loop
-    for i in range(1, 5):
+    for i in range(1, 10):
         m.get_current_window()
     m.timer.send_to_json()

@@ -5,6 +5,10 @@ import datetime
 def find_current_path():
     current = datetime.date.today()
     current = current + datetime.timedelta(days=-current.weekday(), weeks=0)
+    return convert_file(current)
+
+
+def convert_file(current):
     file = str(current) + ".json"
     return rf"C:\Users\tsrow\PycharmProjects\ScreenTime\data\{file}"
 
