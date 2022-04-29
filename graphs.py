@@ -55,7 +55,6 @@ one_app = {
             }
 }
 
-
 class TotalCreator:
     """
     Retrieves data from the running total and sends it to the GUI
@@ -101,6 +100,9 @@ class TotalCreator:
             return True
         else:
             return False
+
+    def get_names(self):
+        return self.data.keys()
 
 """
 class GraphCreator:

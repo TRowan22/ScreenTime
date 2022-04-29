@@ -14,7 +14,7 @@ import datetime
 import numpy as np
 import graphs as graph
 from PyQt5.QtWidgets import QVBoxLayout, QMainWindow, QApplication, QLabel, QWidget, \
-    QPushButton, QLineEdit, QHBoxLayout, QDockWidget, QSizePolicy, QDialog
+    QPushButton, QLineEdit, QHBoxLayout, QDockWidget, QSizePolicy, QDialog, QScrollArea, QGroupBox
 from PyQt5.QtGui import QPixmap, QPalette, QIcon, QFont
 from PyQt5.QtCore import *
 
@@ -28,7 +28,7 @@ class MainWindow(QWidget):
         self.WINDOW_WIDTH = int(1920 / 4)
         self.WINDOW_HEIGHT = int(1200 / 1.9)
 
-        self.week = WeekDay(self, int(self.WINDOW_WIDTH / 2))
+        self.week = WeekDay(self, self.WINDOW_HEIGHT, self.WINDOW_WIDTH)
         self.init_app()
         self.show()
 
@@ -41,11 +41,11 @@ class WeekDay(QWidget):
     """
     Widget of buttons that decides whether a week or a day graph is shown
     """
-    def __init__(self, main_wind, half):
+    def __init__(self, main_wind, height, width):
         super().__init__(main_wind)
         self.main_wind = main_wind
-        self.current = CurrentWD()
-        self.half = half
+        self.current = CurrentWD(height, width)
+        self.half = int(width / 2)
         self.init_ui()
 
     def init_ui(self):
@@ -93,10 +93,10 @@ class CurrentWD(QWidget):
     """
     Creates class for switching days/weeks
     """
-    def __init__(self):
+    def __init__(self, height, width):
         super().__init__()
         self.curr_date = datetime.date.today()
-        self.graph = CurrentGraph()
+        self.graph = CurrentGraph(height, width)
 
         self.mode = "day"
         self.label = QPushButton("<", self)
@@ -190,9 +190,15 @@ class CurrentGraph(QDialog):
     """
     Contains the current graph according to button presses
     """
-    def __init__(self):
+    def __init__(self, height, width):
         super().__init__()
+        self.height = height
+        self.width = width
         self.data = graph.TotalCreator("RunningTotal")
+
+        self.apps = QScrollArea()
+        self.apps.setFixedHeight(300)
+        self.add_apps()
         self.days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
         self.hours = range(24)
         self.mode_var = "day"
@@ -209,14 +215,24 @@ class CurrentGraph(QDialog):
         # set the layout
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
-        layout.addWidget(AppInfo("Firefox"))
-        layout.addWidget(AppInfo("Firefox"))
-        layout.addWidget(AppInfo("Firefox"))
-        layout.addWidget(AppInfo("Firefox"))
-        layout.addWidget(AppInfo("Firefox"))
+        layout.addWidget(self.apps)
+        layout.setAlignment(Qt.AlignCenter)
         self.setLayout(layout)
 
         self.plot(self.mode_var, datetime.date.today().weekday())
+
+    def add_apps(self):
+        names = list(self.data.get_names())
+        v_apps = QVBoxLayout()
+        for x in names:
+            if not x == "ShellExperienceHost":
+                v_apps.addWidget(AppInfo(x, self.width))
+        v_apps.setContentsMargins(5, 5, 5, 25)
+        gb = QGroupBox()
+        gb.setLayout(v_apps)
+        # gb.setContentsMargins(0, 0, 0, 0)
+        gb.setAlignment(Qt.AlignCenter)
+        self.apps.setWidget(gb)
 
     def plot(self, mode, day):
         """
@@ -257,30 +273,32 @@ class AppInfo(QWidget):
     """
     Contains a single app's name and its time
     """
-    def __init__(self, name):
+    def __init__(self, name, width):
         super().__init__()
         self.name = name
         self.data = graph.TotalCreator(name)
+        self.width = int(width / 2.2)
+        print(self.width)
 
         h = QHBoxLayout()
-        app = QPushButton(name, self)
+        app = QPushButton(name)
         app.setFont(QFont('Agenda One', 12))
         app.setFlat(True)
-
+        app.setMinimumWidth(self.width)
         app.setStyleSheet("text-align: left;"
                           "background-color: #bef3f6;")
 
-        total_time = np.sum(self.data.get_day_total(4))
-        time = QPushButton(str(int(total_time)), self)
+        total_time = int(np.sum(self.data.get_day_total(4)))
+        time = QPushButton(str(total_time))
         time.setFont(QFont('Agenda One', 12))
+        time.setMinimumWidth(self.width)
         time.setFlat(True)
-
         time.setStyleSheet("text-align: right;"
                            "background-color: #bef3f6;")
 
         h.addWidget(app)
         h.addWidget(time)
-        h.setContentsMargins(50, 12, 55, 0)
+        h.setContentsMargins(0, 0, 0, 0)
         self.setLayout(h)
 
 

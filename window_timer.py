@@ -82,7 +82,8 @@ class MainTimer:
             if p.pid == fore_proc and not self.startSecond == current_second:
                 name = p.name()[0].upper() + p.name()[1:-4]
                 self.timer.update(name)
-                print(datetime.datetime.now().second)
+                # print(datetime.datetime.now().second)
+                # print(name)
                 self.timer.update("RunningTotal")
                 self.startSecond = datetime.datetime.now().second
 
