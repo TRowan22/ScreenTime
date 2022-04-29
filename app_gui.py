@@ -33,7 +33,7 @@ class MainWindow(QWidget):
         self.show()
 
     def init_app(self):
-        self.setStyleSheet("background-color: #cecece;")
+        self.setStyleSheet("background-color: #00ffff;")
         self.setFixedSize(self.WINDOW_WIDTH + 30, self.WINDOW_HEIGHT)
 
 
@@ -94,7 +94,6 @@ class CurrentWD(QWidget):
     def __init__(self):
         super().__init__()
         self.curr_date = datetime.date.today()
-        self.week_start = self.curr_date + datetime.timedelta(days=-self.curr_date.weekday(), weeks=0)
         self.graph = CurrentGraph()
 
         self.mode = "day"
@@ -136,24 +135,38 @@ class CurrentWD(QWidget):
         Changes whether the label displays time by weeks or days
         :param given_mode: Week mode or Day mode
         """
-        self.curr_date = datetime.date.today()
-        self.week_start = self.curr_date + datetime.timedelta(days=-self.curr_date.weekday(), weeks=0)
+        if given_mode == "day":
+            self.curr_date = datetime.date.today()
+        if given_mode == "week":
+            self.curr_date += datetime.timedelta(days=-self.curr_date.weekday(), weeks=0)
+
         self.mode = given_mode
         self.check_mode(self.mode)
         self.graph.plot(self.mode, datetime.datetime.today().weekday())
 
     def change_by_one(self, forward):
-        self.curr_date = self.curr_date + datetime.timedelta(days=(1 if forward else -1))
-        self.week_start = self.week_start + datetime.timedelta(weeks=(1 if forward else -1))
+        """
+        Changes the day by either forward one or backwards one
+        :param forward: whether we are moving forwards or backwards one day
+        """
+        if self.mode == "day":
+            self.curr_date += datetime.timedelta(days=(1 if forward else -1))
+        if self.mode == "week":
+            self.curr_date += datetime.timedelta(weeks=(1 if forward else -1))
 
+        self.graph.set_path(self.curr_date)
         self.check_mode(self.mode)
-        self.graph.change_by_one(self.mode, forward)
+        self.graph.change_by_one(self.mode, self.curr_date)
 
     def check_mode(self, mode):
+        """
+        Updates the date label to reflect the current date
+        :param mode:
+        """
         if mode == "day":
             self.label2.setText(self.curr_date.strftime("%A, %B %d, %Y"))
         if mode == "week":
-            self.label2.setText(f'Week of Monday, {self.week_start.strftime("%B %d, %Y")}')
+            self.label2.setText(f'Week of Monday, {self.curr_date.strftime("%B %d, %Y")}')
 
 
 class CurrentGraph(QDialog):
@@ -204,13 +217,15 @@ class CurrentGraph(QDialog):
         ax.bar(x_axis, data, color='maroon', width=0.4)
         self.canvas.draw()
 
-    def change_by_one(self, mode, forward):
-        if mode == "day":
-            self.curr_date = self.curr_date + datetime.timedelta(days=(1 if forward else -1))
+    def change_by_one(self, mode, date):
+        self.mode_var = mode
         if mode == "week":
-            self.curr_date = self.curr_date + datetime.timedelta(days=-self.curr_date.weekday(), weeks=(1 if forward else -1))
-            self.data.set_path(self.curr_date)
-        self.plot(mode, self.curr_date.weekday())
+            self.set_path(date)
+        self.plot(mode, date.weekday())
+
+    def set_path(self, date):
+        week_date = date + datetime.timedelta(days=-date.weekday(), weeks=0)
+        self.data.set_path(week_date)
 
 
 class AppInfo(QWidget):

@@ -65,8 +65,8 @@ class TotalCreator:
     """
 
     def __init__(self, name):
-        self.path = jsutils.find_current_path()
-        self.data = jsutils.read(self.path)
+        self.path = jsutils.JsonUtils.find_current_path()
+        self.data = jsutils.JsonUtils.read(self.path)
         self.name = name
 
     def get_day_total(self, day):
@@ -98,7 +98,7 @@ class TotalCreator:
         path = rf"C:\Users\tsrow\PycharmProjects\ScreenTime\data\{file}"
         if os.path.isfile(path):
             self.path = path
-            self.data = jsutils.read(self.path)
+            self.data = jsutils.JsonUtils.read(self.path)
         else:
             print("File not found!")
 

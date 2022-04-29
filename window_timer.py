@@ -13,10 +13,10 @@ class TimesStruct:
         If path is not a file yet, create it
         Else read the data from it
         """
-        self.path = jsutils.find_current_path()
+        self.path = jsutils.JsonUtils.find_current_path()
 
         if os.path.isfile(self.path):
-            self.times = jsutils.read(self.path)
+            self.times = jsutils.JsonUtils.read(self.path)
         else:
             self.add()
 
@@ -28,8 +28,8 @@ class TimesStruct:
         :return:
         """
 
-        jsutils.write(self.path, {})
-        self.times = jsutils.read(self.path)
+        jsutils.JsonUtils.write(self.path, {})
+        self.times = jsutils.JsonUtils.read(self.path)
         self.create_app("RunningTotal")
 
     def update(self, name):
@@ -56,7 +56,7 @@ class TimesStruct:
         self.times.update({name: new_dict})
 
     def send_to_json(self):
-        jsutils.write(self.path, self.times)
+        jsutils.JsonUtils.write(self.path, self.times)
 
 
 class MainTimer:
