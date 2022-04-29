@@ -26,14 +26,14 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.WINDOW_WIDTH = int(1920 / 4)
-        self.WINDOW_HEIGHT = int(1200 / 2)
+        self.WINDOW_HEIGHT = int(1200 / 1.9)
 
         self.week = WeekDay(self, int(self.WINDOW_WIDTH / 2))
         self.init_app()
         self.show()
 
     def init_app(self):
-        self.setStyleSheet("background-color: #00ffff;")
+        self.setStyleSheet("background-color: #ffffff;")
         self.setFixedSize(self.WINDOW_WIDTH + 30, self.WINDOW_HEIGHT)
 
 
@@ -52,13 +52,15 @@ class WeekDay(QWidget):
         hbox = QHBoxLayout()
         week = QPushButton("Week", self.main_wind)
 
-        week.setStyleSheet(f"min-width: {self.half}px;")
+        week.setStyleSheet(f"min-width: {self.half}px;"
+                           "background-color: #c0f6b8;")
         week.setFont(QFont("Agenda One", 10))
         week.clicked.connect(lambda: self.clicked("week"))
 
         day = QPushButton("Day", self.main_wind)
 
-        day.setStyleSheet(f"min-width: {self.half}px;")
+        day.setStyleSheet(f"min-width: {self.half}px;"
+                          "background-color: #c0f6b8;")
         day.setFont(QFont("Agenda One", 10))
         day.clicked.connect(lambda: self.clicked("day"))
 
@@ -106,10 +108,13 @@ class CurrentWD(QWidget):
         hbox = QHBoxLayout()
 
         self.label.clicked.connect(lambda: self.change_by_one(False))
+        self.label.setStyleSheet("background-color: #bef3f6;")
         self.label3.clicked.connect(lambda: self.change_by_one(True))
+        self.label3.setStyleSheet("background-color: #bef3f6;")
 
         self.label2.setAlignment(Qt.AlignCenter)
         self.label2.setFont(QFont('Agenda One', 10))
+        self.label2.setStyleSheet("background-color: #bef3f6;")
 
         hbox.addWidget(self.label)
         hbox.addWidget(self.label2)
@@ -149,14 +154,26 @@ class CurrentWD(QWidget):
         Changes the day by either forward one or backwards one
         :param forward: whether we are moving forwards or backwards one day
         """
-        if self.mode == "day":
+        if self.mode == "day" and self.check_day(forward):
             self.curr_date += datetime.timedelta(days=(1 if forward else -1))
-        if self.mode == "week":
+        if self.mode == "week" and self.check_week(forward):
             self.curr_date += datetime.timedelta(weeks=(1 if forward else -1))
 
-        self.graph.set_path(self.curr_date)
+        # self.graph.set_path(self.curr_date)
         self.check_mode(self.mode)
         self.graph.change_by_one(self.mode, self.curr_date)
+
+    def check_day(self, forward):
+        if forward and self.curr_date == datetime.date.today():
+            return False
+        if not forward and not self.graph.set_path(self.curr_date):
+            return False
+        return True
+
+    def check_week(self, forward):
+        if not self.graph.set_path(self.curr_date + datetime.timedelta(weeks=(1 if forward else -1))):
+            return False
+        return True
 
     def check_mode(self, mode):
         """
@@ -179,7 +196,6 @@ class CurrentGraph(QDialog):
         self.days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
         self.hours = range(24)
         self.mode_var = "day"
-        self.curr_date = datetime.date.today()
 
         self.figure = Figure()
         self.figure.set_figwidth(2)
@@ -193,9 +209,14 @@ class CurrentGraph(QDialog):
         # set the layout
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
+        layout.addWidget(AppInfo("Firefox"))
+        layout.addWidget(AppInfo("Firefox"))
+        layout.addWidget(AppInfo("Firefox"))
+        layout.addWidget(AppInfo("Firefox"))
+        layout.addWidget(AppInfo("Firefox"))
         self.setLayout(layout)
 
-        self.plot(self.mode_var, self.curr_date.weekday())
+        self.plot(self.mode_var, datetime.date.today().weekday())
 
     def plot(self, mode, day):
         """
@@ -219,15 +240,19 @@ class CurrentGraph(QDialog):
 
     def change_by_one(self, mode, date):
         self.mode_var = mode
-        if mode == "week":
-            self.set_path(date)
         self.plot(mode, date.weekday())
 
     def set_path(self, date):
         week_date = date + datetime.timedelta(days=-date.weekday(), weeks=0)
-        self.data.set_path(week_date)
+        return self.data.set_path(week_date)
 
 
+"""
+List every app out that isn't running total
+Put each in an app info
+Make function in graphs that returns that specific app info's data if app info clicked
+Embolden that specific app info so users know it is the correct one
+"""
 class AppInfo(QWidget):
     """
     Contains a single app's name and its time
@@ -242,14 +267,16 @@ class AppInfo(QWidget):
         app.setFont(QFont('Agenda One', 12))
         app.setFlat(True)
 
-        app.setStyleSheet("text-align: left")
+        app.setStyleSheet("text-align: left;"
+                          "background-color: #bef3f6;")
 
-        total_time = np.sum(self.data.get_day_total(2))
+        total_time = np.sum(self.data.get_day_total(4))
         time = QPushButton(str(int(total_time)), self)
         time.setFont(QFont('Agenda One', 12))
         time.setFlat(True)
 
-        time.setStyleSheet("text-align: right;")
+        time.setStyleSheet("text-align: right;"
+                           "background-color: #bef3f6;")
 
         h.addWidget(app)
         h.addWidget(time)

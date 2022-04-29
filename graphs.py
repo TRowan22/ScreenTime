@@ -94,13 +94,13 @@ class TotalCreator:
         return total
 
     def set_path(self, curr_week):
-        file = str(curr_week) + ".json"
-        path = rf"C:\Users\tsrow\PycharmProjects\ScreenTime\data\{file}"
+        path = jsutils.JsonUtils.convert_file(curr_week)
         if os.path.isfile(path):
             self.path = path
             self.data = jsutils.JsonUtils.read(self.path)
+            return True
         else:
-            print("File not found!")
+            return False
 
 """
 class GraphCreator:

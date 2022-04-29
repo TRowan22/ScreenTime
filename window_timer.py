@@ -82,6 +82,7 @@ class MainTimer:
             if p.pid == fore_proc and not self.startSecond == current_second:
                 name = p.name()[0].upper() + p.name()[1:-4]
                 self.timer.update(name)
+                print(datetime.datetime.now().second)
                 self.timer.update("RunningTotal")
                 self.startSecond = datetime.datetime.now().second
 
@@ -90,6 +91,6 @@ if __name__ == "__main__":
     m = MainTimer()
 
     # add every second loop
-    for i in range(1, 10):
+    while not datetime.datetime.now().second == 0:
         m.get_current_window()
     m.timer.send_to_json()
