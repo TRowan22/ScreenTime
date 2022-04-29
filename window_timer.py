@@ -4,6 +4,7 @@ import psutil as util
 import datetime
 import jsonutils as jsutils
 import os
+import threading, time
 
 
 class TimesStruct:
@@ -76,16 +77,20 @@ class MainTimer:
         Gets the current window, updates if the proper tick
         :return:
         """
-        current_second = datetime.datetime.now().second
+
         fore_proc = proc.GetWindowThreadProcessId(gui.GetForegroundWindow())[1]
         for p in util.process_iter(['pid', 'name']):
-            if p.pid == fore_proc and not self.startSecond == current_second:
+            if p.pid == fore_proc:
                 name = p.name()[0].upper() + p.name()[1:-4]
                 self.timer.update(name)
-                # print(datetime.datetime.now().second)
+                print(datetime.datetime.now().second)
                 # print(name)
                 self.timer.update("RunningTotal")
-                self.startSecond = datetime.datetime.now().second
+
+    def update(self):
+        while True:
+            print('h')
+            self.get_current_window()
 
 
 if __name__ == "__main__":

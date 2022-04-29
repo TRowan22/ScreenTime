@@ -6,6 +6,7 @@ Graph
 List of apps          Time Spent
 (bar scaled by how much time spent)
 """
+import window_timer
 import sys
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas)
@@ -30,6 +31,8 @@ class MainWindow(QWidget):
 
         self.week = WeekDay(self, self.WINDOW_HEIGHT, self.WINDOW_WIDTH)
         self.init_app()
+
+    def show_window(self):
         self.show()
 
     def init_app(self):
@@ -278,7 +281,6 @@ class AppInfo(QWidget):
         self.name = name
         self.data = graph.TotalCreator(name)
         self.width = int(width / 2.2)
-        print(self.width)
 
         h = QHBoxLayout()
         app = QPushButton(name)
@@ -305,4 +307,6 @@ class AppInfo(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
+    m = window_timer.MainTimer()
+
     sys.exit(app.exec_())
