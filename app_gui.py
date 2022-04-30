@@ -232,6 +232,9 @@ class CurrentGraph(QDialog):
         for x in names:
             if not x == "ShellExperienceHost":
                 v_apps.addWidget(AppInfo(self, x, self.width, self.curr_date.weekday()))
+        if self.name not in names:
+            self.name = "RunningTotal"
+            self.data = graph.TotalCreator(self.name)
         v_apps.setContentsMargins(5, 5, 5, 25)
         gb = QGroupBox()
         gb.setLayout(v_apps)
