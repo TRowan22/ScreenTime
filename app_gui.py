@@ -50,6 +50,9 @@ class WeekDay(QWidget):
         self.init_ui()
 
     def init_ui(self):
+        """
+        Creates the "week" and "day" that change the mode of the app
+        """
         hbox = QHBoxLayout()
         week = QPushButton("Week", self.main_wind)
 
@@ -82,7 +85,7 @@ class WeekDay(QWidget):
     def clicked(self, mode):
         """
         Function that controls what happens to the app when the week button is clicked
-        Clicked just doesn't error and returns error codes because they hate you
+        Changes current day/week label
         """
         self.current.change_label(mode)
 
@@ -106,6 +109,9 @@ class CurrentWD(QWidget):
         self.init_ui()
 
     def init_ui(self):
+        """
+        Creates current day/week label and two buttons for moving forward and backward
+        """
         hbox = QHBoxLayout()
 
         self.label.clicked.connect(lambda: self.change_by_one(False))
@@ -153,7 +159,7 @@ class CurrentWD(QWidget):
     def change_by_one(self, forward):
         """
         Changes the day by either forward one or backwards one
-        :param forward: whether we are moving forwards or backwards one day
+        :param forward: whether we are moving forwards or backwards one
         """
         if self.mode == "day" and self.check_day(forward):
             self.curr_date += datetime.timedelta(days=(1 if forward else -1))
@@ -165,6 +171,10 @@ class CurrentWD(QWidget):
         self.graph.change_by_one(self.mode, self.curr_date)
 
     def check_day(self, forward):
+        """
+        :param forward: whether we are moving forwards or backwards one day
+        :return: whether the day exists in a data file
+        """
         path = self.graph.set_path(self.curr_date)
         if forward and self.curr_date == datetime.date.today():
             return False
@@ -173,6 +183,10 @@ class CurrentWD(QWidget):
         return True
 
     def check_week(self, forward):
+        """
+        :param forward: whether we are moving forwards or backwards one week
+        :return: whether the week file exists
+        """
         path = self.graph.set_path(self.curr_date + datetime.timedelta(weeks=(1 if forward else -1)))
         if not path:
             return False
@@ -181,7 +195,7 @@ class CurrentWD(QWidget):
     def check_mode(self, mode):
         """
         Updates the date label to reflect the current date
-        :param mode:
+        :param mode: either day or week
         """
         if mode == "day":
             self.label2.setText(self.curr_date.strftime("%A, %B %d, %Y"))
@@ -227,6 +241,9 @@ class CurrentGraph(QDialog):
         self.plot(self.mode_var, datetime.date.today().weekday())
 
     def add_apps(self):
+        """
+        Adds all apps seen in the current week file to the app list (displayed in the class below)
+        """
         names = list(self.data.get_names())
         v_apps = QVBoxLayout()
         for x in names:
@@ -244,7 +261,7 @@ class CurrentGraph(QDialog):
     def plot(self, mode, day):
         """
         :param mode: either week or day
-        :param day: amoguss
+        :param day: the given day we want to plot (week mode will just plot the whole week)
         Plots either the week or day
         """
         # random data
@@ -262,17 +279,30 @@ class CurrentGraph(QDialog):
         self.canvas.draw()
 
     def change_by_one(self, mode, date):
+        """
+        Changes the graph depending on the mode (day calculation handled in CurrentWD class)
+        :param mode: either week or day
+        :param date: the current date we are at (changed in the CurrentWD class)
+        """
         self.mode_var = mode
         self.curr_date = date
         self.add_apps()
         self.plot(mode, date.weekday())
 
     def set_path(self, date):
+        """
+        :param date: the current date
+        Sets a new data path according to the given date
+        """
         week_date = date + datetime.timedelta(days=-date.weekday(), weeks=0)
         print(week_date)
         return self.data.set_path(week_date)
 
     def change_data_name(self, name):
+        """
+        Changes the graph to display the data of a specific app (or the total)
+        :param name: the name of the app we want to display
+        """
         self.name = name
         self.data = graph.TotalCreator(self.name)
         self.plot(self.mode_var, self.curr_date.weekday())
@@ -286,7 +316,7 @@ Embolden that specific app info so users know it is the correct one
 """
 class AppInfo(QWidget):
     """
-    Contains a single app's name and its time
+    Contains a single app's name and the time spent on the app
     """
     def __init__(self, parent, name, width, day):
         super().__init__()
@@ -318,6 +348,9 @@ class AppInfo(QWidget):
         self.setLayout(h)
 
     def change_graph(self):
+        """
+        Changes what app the graph shows
+        """
         self.parent.change_data_name(self.name)
 
 

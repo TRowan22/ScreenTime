@@ -93,6 +93,11 @@ class TotalCreator:
         return total
 
     def set_path(self, curr_week):
+        """
+        Sets this object's data path to another file
+        :param curr_week: the week file we want to find
+        :return: Whether the file currently exists
+        """
         path = jsutils.JsonUtils.convert_file(curr_week)
         if os.path.isfile(path):
             self.path = path
@@ -102,6 +107,9 @@ class TotalCreator:
             return False
 
     def get_names(self):
+        """
+        :return: the names of all apps read in a certain weekly file
+        """
         return self.data.keys()
 
 """
