@@ -1,11 +1,3 @@
-"""
-Week - Day buttons
-
-Graph
-
-List of apps          Time Spent
-(bar scaled by how much time spent)
-"""
 import window_timer
 import sys
 from matplotlib.backends.backend_qt5agg import (
@@ -18,6 +10,14 @@ from PyQt5.QtWidgets import QVBoxLayout, QMainWindow, QApplication, QLabel, QWid
     QPushButton, QLineEdit, QHBoxLayout, QDockWidget, QSizePolicy, QDialog, QScrollArea, QGroupBox
 from PyQt5.QtGui import QPixmap, QPalette, QIcon, QFont
 from PyQt5.QtCore import *
+
+
+class WorkerThread(QThread):
+    progress = pyqtSignal(int)
+    def run(self):
+        for i in range(100):
+            print(i)
+            self.progress.emit(i)
 
 
 class MainWindow(QWidget):
@@ -165,14 +165,16 @@ class CurrentWD(QWidget):
         self.graph.change_by_one(self.mode, self.curr_date)
 
     def check_day(self, forward):
+        path = self.graph.set_path(self.curr_date)
         if forward and self.curr_date == datetime.date.today():
             return False
-        if not forward and not self.graph.set_path(self.curr_date):
+        if not forward and not path:
             return False
         return True
 
     def check_week(self, forward):
-        if not self.graph.set_path(self.curr_date + datetime.timedelta(weeks=(1 if forward else -1))):
+        path = self.graph.set_path(self.curr_date + datetime.timedelta(weeks=(1 if forward else -1)))
+        if not path:
             return False
         return True
 
@@ -195,7 +197,8 @@ class CurrentGraph(QDialog):
         super().__init__()
         self.height = height
         self.width = width
-        self.data = graph.TotalCreator("RunningTotal")
+        self.name = "RunningTotal"
+        self.data = graph.TotalCreator(self.name)
         self.curr_date = datetime.date.today()
 
         self.apps = QScrollArea()
@@ -232,7 +235,6 @@ class CurrentGraph(QDialog):
         v_apps.setContentsMargins(5, 5, 5, 25)
         gb = QGroupBox()
         gb.setLayout(v_apps)
-        # gb.setContentsMargins(0, 0, 0, 0)
         gb.setAlignment(Qt.AlignCenter)
         self.apps.setWidget(gb)
 
@@ -259,20 +261,18 @@ class CurrentGraph(QDialog):
     def change_by_one(self, mode, date):
         self.mode_var = mode
         self.curr_date = date
-        self.plot(mode, date.weekday())
         self.add_apps()
+        self.plot(mode, date.weekday())
 
     def set_path(self, date):
         week_date = date + datetime.timedelta(days=-date.weekday(), weeks=0)
+        print(week_date)
         return self.data.set_path(week_date)
 
-    def change_path_name(self, name):
-        print(name)
-        self.data = graph.TotalCreator(name)
-        print('h')
+    def change_data_name(self, name):
+        self.name = name
+        self.data = graph.TotalCreator(self.name)
         self.plot(self.mode_var, self.curr_date.weekday())
-        self.add_apps()
-
 
 
 """
@@ -315,8 +315,7 @@ class AppInfo(QWidget):
         self.setLayout(h)
 
     def change_graph(self):
-        print('e')
-        self.parent.change_path_name(self.name)
+        self.parent.change_data_name(self.name)
 
 
 if __name__ == "__main__":

@@ -89,7 +89,6 @@ class MainTimer:
 
     def update(self):
         while True:
-            print('h')
             self.get_current_window()
 
 
