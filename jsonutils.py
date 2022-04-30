@@ -1,5 +1,7 @@
 import json
 import datetime
+import os
+
 
 class JsonUtils:
     @staticmethod
@@ -11,7 +13,8 @@ class JsonUtils:
     @staticmethod
     def convert_file(current):
         file = str(current) + ".json"
-        return rf"C:\Users\tsrow\PycharmProjects\ScreenTime\data\{file}"
+        path = os.path.dirname(os.path.realpath(__file__))
+        return rf"{path}\data\{file}"
 
     @staticmethod
     def write(path, data):

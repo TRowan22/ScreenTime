@@ -31,8 +31,6 @@ class MainWindow(QWidget):
 
         self.week = WeekDay(self, self.WINDOW_HEIGHT, self.WINDOW_WIDTH)
         self.init_app()
-
-    def show_window(self):
         self.show()
 
     def init_app(self):
@@ -198,6 +196,7 @@ class CurrentGraph(QDialog):
         self.height = height
         self.width = width
         self.data = graph.TotalCreator("RunningTotal")
+        self.curr_date = datetime.date.today()
 
         self.apps = QScrollArea()
         self.apps.setFixedHeight(300)
@@ -229,7 +228,7 @@ class CurrentGraph(QDialog):
         v_apps = QVBoxLayout()
         for x in names:
             if not x == "ShellExperienceHost":
-                v_apps.addWidget(AppInfo(x, self.width))
+                v_apps.addWidget(AppInfo(self, x, self.width, self.curr_date.weekday()))
         v_apps.setContentsMargins(5, 5, 5, 25)
         gb = QGroupBox()
         gb.setLayout(v_apps)
@@ -259,11 +258,21 @@ class CurrentGraph(QDialog):
 
     def change_by_one(self, mode, date):
         self.mode_var = mode
+        self.curr_date = date
         self.plot(mode, date.weekday())
+        self.add_apps()
 
     def set_path(self, date):
         week_date = date + datetime.timedelta(days=-date.weekday(), weeks=0)
         return self.data.set_path(week_date)
+
+    def change_path_name(self, name):
+        print(name)
+        self.data = graph.TotalCreator(name)
+        print('h')
+        self.plot(self.mode_var, self.curr_date.weekday())
+        self.add_apps()
+
 
 
 """
@@ -276,8 +285,9 @@ class AppInfo(QWidget):
     """
     Contains a single app's name and its time
     """
-    def __init__(self, name, width):
+    def __init__(self, parent, name, width, day):
         super().__init__()
+        self.parent = parent
         self.name = name
         self.data = graph.TotalCreator(name)
         self.width = int(width / 2.2)
@@ -289,8 +299,9 @@ class AppInfo(QWidget):
         app.setMinimumWidth(self.width)
         app.setStyleSheet("text-align: left;"
                           "background-color: #bef3f6;")
+        app.clicked.connect(self.change_graph)
 
-        total_time = int(np.sum(self.data.get_day_total(4)))
+        total_time = int(np.sum(self.data.get_day_total(day)))
         time = QPushButton(str(total_time))
         time.setFont(QFont('Agenda One', 12))
         time.setMinimumWidth(self.width)
@@ -302,6 +313,10 @@ class AppInfo(QWidget):
         h.addWidget(time)
         h.setContentsMargins(0, 0, 0, 0)
         self.setLayout(h)
+
+    def change_graph(self):
+        print('e')
+        self.parent.change_path_name(self.name)
 
 
 if __name__ == "__main__":
