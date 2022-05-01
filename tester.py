@@ -1,4 +1,6 @@
 import unittest
+
+import jsonutils
 import window_timer as wt
 import sys
 from PyQt5.QtWidgets import QVBoxLayout, QMainWindow, QApplication, QLabel, QWidget, QPushButton, QLineEdit, QHBoxLayout
@@ -7,6 +9,7 @@ class TestApp(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
         self.timer = wt.TimesStruct()
+        self.timer.path = jsonutils.JsonUtils.convert_file("tester_file")
 
         self.one_app = {
             "Firefox": {

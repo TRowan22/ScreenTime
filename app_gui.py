@@ -1,3 +1,5 @@
+import time
+
 import window_timer
 import sys
 from matplotlib.backends.backend_qt5agg import (
@@ -12,12 +14,14 @@ from PyQt5.QtGui import QPixmap, QPalette, QIcon, QFont
 from PyQt5.QtCore import *
 
 
-class WorkerThread(QThread):
-    progress = pyqtSignal(int)
+class WorkerThread(QObject):
+    start = pyqtSignal(int)
+
+    # @pyqtSlot
     def run(self):
         for i in range(100):
             print(i)
-            self.progress.emit(i)
+            datetime.time.sleep(1)
 
 
 class MainWindow(QWidget):
@@ -29,6 +33,13 @@ class MainWindow(QWidget):
         self.WINDOW_WIDTH = int(1920 / 4)
         self.WINDOW_HEIGHT = int(1200 / 1.9)
 
+        thread = QThread()
+        thread.start()
+
+        work = WorkerThread()
+        work.moveToThread(thread)
+        work.start()
+
         self.week = WeekDay(self, self.WINDOW_HEIGHT, self.WINDOW_WIDTH)
         self.init_app()
         self.show()
@@ -36,6 +47,13 @@ class MainWindow(QWidget):
     def init_app(self):
         self.setStyleSheet("background-color: #ffffff;")
         self.setFixedSize(self.WINDOW_WIDTH + 30, self.WINDOW_HEIGHT)
+
+    def evt_timer(self):
+        self.worker.start()
+        self.worker.progress.connect(self.evt_timer_update)
+
+    def evt_timer_update(self):
+        print('h')
 
 
 class WeekDay(QWidget):
@@ -264,17 +282,21 @@ class CurrentGraph(QDialog):
         :param day: the given day we want to plot (week mode will just plot the whole week)
         Plots either the week or day
         """
-        # random data
-        if mode == "day":
-            data = self.data.get_day_total(day)
-            x_axis = self.hours
-        if mode == "week":
-            data = self.data.get_week_total()
-            x_axis = self.days
 
         self.mode_var = mode
         self.figure.clear()
         ax = self.figure.add_subplot(111)
+
+        # random data
+        if mode == "day":
+            data = self.data.get_day_total(day)
+            x_axis = self.hours
+            ax.axes.set_ylim(0, 60)
+        if mode == "week":
+            data = self.data.get_week_total()
+            x_axis = self.days
+            ax.axes.set_ylim(0, 24)
+
         ax.bar(x_axis, data, color='maroon', width=0.4)
         self.canvas.draw()
 
@@ -357,6 +379,4 @@ class AppInfo(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
-    m = window_timer.MainTimer()
-
     sys.exit(app.exec_())
