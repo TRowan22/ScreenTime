@@ -8,6 +8,7 @@ from threading import Thread
 from PyQt5.QtWidgets import QApplication
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = gui.MainWindow()
-    sys.exit(app.exec_())
+    t = threading.Thread(target=window_timer.main_func)
+    t2 = threading.Thread(target=gui.main_func)
+    t.start()
+    t2.start()

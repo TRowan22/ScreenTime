@@ -64,8 +64,7 @@ class MainTimer:
     WINDOW_WIDTH = 1920
     WINDOW_HEIGHT = 1200
 
-    def __init__(self, apps=[]):
-        self.apps = apps
+    def __init__(self):
         self.timer = TimesStruct()
         self.currentDay = datetime.datetime.today().weekday()
         self.startSecond = datetime.datetime.now().second
@@ -84,7 +83,7 @@ class MainTimer:
                 name = p.name()[0].upper() + p.name()[1:-4]
                 self.timer.update(name)
                 print(datetime.datetime.now().second)
-                # print(name)
+                print(name)
                 self.timer.update("RunningTotal")
 
     def update(self):
@@ -92,10 +91,12 @@ class MainTimer:
             self.get_current_window()
 
 
-if __name__ == "__main__":
+def main_func():
     m = MainTimer()
 
     # add every second loop
-    while not datetime.datetime.now().second == 0:
+    #while not datetime.datetime.now().second == 0:
+    for i in range(100):
         m.get_current_window()
     m.timer.send_to_json()
+

@@ -14,28 +14,6 @@ from PyQt5.QtGui import QPixmap, QPalette, QIcon, QFont
 from PyQt5.QtCore import *
 
 
-class WorkerThread(QObject):
-    start_sig = pyqtSignal(int)
-    finished_sig = pyqtSignal()
-
-    def run(self):
-        self.start_sig.emit()
-        print(1)
-        time.sleep(1)
-        print(3)
-        self.finished_sig.emit()
-
-
-class TaskManager():
-    def __init__(self, task_class):
-        self.thread = QThread()
-        self.task = task_class()
-        self.task.moveToThread(self.thread)
-        self.thread.started.connect(self.task.run)
-        #self.task.finished_sig.connect(self.thread.quit)
-        #self.thread.start()
-
-
 class MainWindow(QWidget):
     """
     The main widget as a container for all other widgets
@@ -48,8 +26,6 @@ class MainWindow(QWidget):
         self.week = WeekDay(self, self.WINDOW_HEIGHT, self.WINDOW_WIDTH)
         self.init_app()
         self.show()
-
-        self.tm = TaskManager(WorkerThread)
 
     def init_app(self):
         self.setStyleSheet("background-color: #ffffff;")
@@ -382,8 +358,14 @@ class AppInfo(QWidget):
         """
         self.parent.change_data_name(self.name)
 
-
+"""
 if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    sys.exit(app.exec_())
+"""
+
+def main_func():
     app = QApplication(sys.argv)
     window = MainWindow()
     sys.exit(app.exec_())
