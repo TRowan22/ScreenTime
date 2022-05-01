@@ -44,7 +44,7 @@ class TimesStruct:
         if name not in self.times.keys():
             self.create_app(name)
         else:
-            self.times[name][str(curr_day)][str(curr_hour)] += 1
+            self.times[name][str(curr_day)][str(curr_hour)] += 5
 
     def create_app(self, name):
         """
@@ -94,9 +94,13 @@ class MainTimer:
 def main_func():
     m = MainTimer()
 
-    # add every second loop
-    #while not datetime.datetime.now().second == 0:
-    for i in range(100):
-        m.get_current_window()
-    m.timer.send_to_json()
+    start_time = datetime.datetime.now()
+    while True:
+        curr_time = datetime.datetime.now()
+        if not start_time + datetime.timedelta(seconds=5) >= curr_time:
+            m.get_current_window()
+            m.timer.send_to_json()
+            start_time = curr_time
+        time.sleep(1)
+
 

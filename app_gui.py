@@ -365,6 +365,7 @@ if __name__ == "__main__":
     sys.exit(app.exec_())
 """
 
+
 def main_func():
     app = QApplication(sys.argv)
     window = MainWindow()
