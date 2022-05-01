@@ -1,7 +1,7 @@
 import time
 
 import window_timer
-import sys
+import sys, time
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas)
 from matplotlib.figure import Figure
@@ -15,13 +15,25 @@ from PyQt5.QtCore import *
 
 
 class WorkerThread(QObject):
-    start = pyqtSignal(int)
+    start_sig = pyqtSignal(int)
+    finished_sig = pyqtSignal()
 
-    # @pyqtSlot
     def run(self):
-        for i in range(100):
-            print(i)
-            datetime.time.sleep(1)
+        self.start_sig.emit()
+        print(1)
+        time.sleep(1)
+        print(3)
+        self.finished_sig.emit()
+
+
+class TaskManager():
+    def __init__(self, task_class):
+        self.thread = QThread()
+        self.task = task_class()
+        self.task.moveToThread(self.thread)
+        self.thread.started.connect(self.task.run)
+        #self.task.finished_sig.connect(self.thread.quit)
+        #self.thread.start()
 
 
 class MainWindow(QWidget):
@@ -33,16 +45,11 @@ class MainWindow(QWidget):
         self.WINDOW_WIDTH = int(1920 / 4)
         self.WINDOW_HEIGHT = int(1200 / 1.9)
 
-        thread = QThread()
-        thread.start()
-
-        work = WorkerThread()
-        work.moveToThread(thread)
-        work.start()
-
         self.week = WeekDay(self, self.WINDOW_HEIGHT, self.WINDOW_WIDTH)
         self.init_app()
         self.show()
+
+        self.tm = TaskManager(WorkerThread)
 
     def init_app(self):
         self.setStyleSheet("background-color: #ffffff;")
