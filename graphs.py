@@ -79,7 +79,7 @@ class TotalCreator:
 
         hours = hours / 60
 
-        return hours
+        return list(hours)
 
     def get_week_total(self):
         """
@@ -91,7 +91,7 @@ class TotalCreator:
 
         total = np.array(total) / 60
 
-        return total
+        return list(total)
 
     def set_path(self, curr_week):
         """
@@ -101,7 +101,7 @@ class TotalCreator:
         """
 
         path = jsutils.JsonUtils.convert_file(curr_week)
-        print(curr_week, os.path.isfile(path))
+       # print(curr_week, os.path.isfile(path))
         if os.path.isfile(path):
             self.path = path
             self.data = jsutils.JsonUtils.read(self.path)

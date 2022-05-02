@@ -4,6 +4,7 @@ import jsonutils
 import datetime
 import window_timer as wt
 import os
+import graphs
 import sys
 from PyQt5.QtWidgets import QVBoxLayout, QMainWindow, QApplication, QLabel, QWidget, QPushButton, QLineEdit, QHBoxLayout
 
@@ -289,6 +290,7 @@ class TestApp(unittest.TestCase):
         self.set_add_app()
 
         # I just hardcoded the hour and day in, which will change depending on when you run the program
+        # So I don't run this test all the time, but if you need to check it just hardcode 5
 
         one_updated = {
             "RunningTotal": {
@@ -392,4 +394,50 @@ class TestApp(unittest.TestCase):
         self.timer.create_app("Firefox")
         self.timer.send_to_json()
         self.assertEqual(jsonutils.JsonUtils.read(self.new_path), self.one_app)
+        os.remove(self.new_path)
+
+    def test_set_path(self):
+        t = graphs.TotalCreator("RunningTotal")
+
+        week_date = datetime.date.today() + datetime.timedelta(days=-datetime.date.today().weekday(), weeks=0)
+
+        self.assertTrue(t.set_path(week_date))
+        self.assertFalse(t.set_path("bad_file"))
+
+    def test_get_day_total(self):
+        self.set_add_app()
+        self.timer.create_app("Firefox")
+        self.timer.times["RunningTotal"]["0"]["0"] += 5
+
+        self.timer.send_to_json()
+        t = graphs.TotalCreator("RunningTotal")
+        t.set_path("tester_file")
+
+        timell = [.08333333333333333, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+        self.assertEqual(t.get_day_total(0), timell)
+        os.remove(self.new_path)
+
+    def test_get_week_total(self):
+        self.set_add_app()
+        self.timer.create_app("Firefox")
+        self.timer.times["RunningTotal"]["0"]["0"] += 3600
+
+        self.timer.send_to_json()
+        t = graphs.TotalCreator("RunningTotal")
+        t.set_path("tester_file")
+
+        timell = [1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+        self.assertEqual(t.get_week_total(), timell)
+        os.remove(self.new_path)
+
+    def test_get_names(self):
+        self.set_add_app()
+        self.timer.create_app("Firefox")
+        self.timer.send_to_json()
+        t = graphs.TotalCreator("RunningTotal")
+        t.set_path("tester_file")
+        self.assertEqual(list(t.get_names()), ["RunningTotal", "Firefox"])
         os.remove(self.new_path)

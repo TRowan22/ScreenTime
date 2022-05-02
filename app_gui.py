@@ -246,7 +246,6 @@ class CurrentGraph(QDialog):
         for x in names:
             if not x == "ShellExperienceHost":
                 a = AppInfo(self, x, self.width, self.curr_date, self.mode_var)
-                #a.set_path(self.curr_date)
                 v_apps.addWidget(a)
         if self.name not in names:
             self.name = "RunningTotal"
@@ -320,6 +319,7 @@ class AppInfo(QWidget):
         self.parent = parent
         self.name = name
         self.data = graph.TotalCreator(name)
+        self.set_path(day)
         self.width = int(width / 2.2)
         self.mode = mode
 
@@ -332,7 +332,12 @@ class AppInfo(QWidget):
                           "background-color: #bef3f6;")
         app.clicked.connect(self.change_graph)
 
-        total_time = int(np.sum(self.data.get_day_total(day.weekday())))
+        if mode == "day":
+            times = self.data.get_day_total(day.weekday())
+        if mode == "week":
+            times = self.data.get_week_total()
+
+        total_time = int(np.sum(times))
         time = QPushButton(str(total_time))
         time.setFont(QFont('Agenda One', 12))
         time.setMinimumWidth(self.width)
@@ -351,6 +356,14 @@ class AppInfo(QWidget):
         """
         self.parent.change_data_name(self.name)
 
+    def set_path(self, date):
+        """
+        :param date: the current date
+        Sets a new data path according to the given date
+        """
+        week_date = date + datetime.timedelta(days=-date.weekday(), weeks=0)
+        # print(week_date)
+        self.data.set_path(week_date)
 
 
 """
