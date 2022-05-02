@@ -31,13 +31,6 @@ class MainWindow(QWidget):
         self.setStyleSheet("background-color: #ffffff;")
         self.setFixedSize(self.WINDOW_WIDTH + 30, self.WINDOW_HEIGHT)
 
-    def evt_timer(self):
-        self.worker.start()
-        self.worker.progress.connect(self.evt_timer_update)
-
-    def evt_timer_update(self):
-        print('h')
-
 
 class WeekDay(QWidget):
     """
@@ -313,12 +306,6 @@ class CurrentGraph(QDialog):
         self.plot(self.mode_var, self.curr_date.weekday())
 
 
-"""
-List every app out that isn't running total
-Put each in an app info
-Make function in graphs that returns that specific app info's data if app info clicked
-Embolden that specific app info so users know it is the correct one
-"""
 class AppInfo(QWidget):
     """
     Contains a single app's name and the time spent on the app

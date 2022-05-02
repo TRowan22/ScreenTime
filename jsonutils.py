@@ -30,7 +30,7 @@ class JsonUtils:
         :param path: self-explanatory
         :param data: self-explanatory
         """
-        with open(path, 'w') as writefile:
+        with open(path, 'w+') as writefile:
             writefile.seek(0)
             json.dump(data, writefile, indent=4)
 
@@ -40,6 +40,6 @@ class JsonUtils:
         Reads data from the given json file path
         :param path: self-explanatory
         """
-        with open(path, 'r') as outfile:
+        with open(path, 'r+') as outfile:
             outfile.seek(0)
             return json.load(outfile)

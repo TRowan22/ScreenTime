@@ -55,6 +55,7 @@ one_app = {
             }
 }
 
+
 class TotalCreator:
     """
     Retrieves data from the running total and sends it to the GUI
@@ -111,49 +112,3 @@ class TotalCreator:
         :return: the names of all apps read in a certain weekly file
         """
         return self.data.keys()
-
-"""
-class GraphCreator:
-    def __init__(self):
-        self.path = jsutils.find_current_path()
-        self.data = jsutils.read(self.path)
-
-    def create_day(self, day):
-        day = self.data["RunningTotal"][day]
-
-        hours = list(day.keys())
-        seconds = list(day.values())
-
-        fig = plt.figure(figsize=(10, 5))
-
-        # creating the bar plot
-        plt.bar(hours, seconds, color='maroon',
-                width=0.4)
-
-        plt.xlabel("Hour")
-        plt.ylabel("Minutes spent")
-        plt.show()
-
-    def create_day_test(self):
-        day = one_app["Firefox"]["0"]
-
-        hours = list(day.keys())
-        seconds = np.array(list(day.values())) / 3600
-
-        fig = plt.figure(figsize=(10, 5))
-
-        # creating the bar plot
-        plt.bar(hours, seconds, color='maroon',
-                width=0.4)
-
-        plt.xlabel("Hour")
-        plt.ylabel("Minutes spent")
-        plt.show()
-
-   # def create_week(self, week):
-
-
-if __name__ == "__main__":
-    g = GraphCreator()
-    g.create_day_test()
-"""
