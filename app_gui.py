@@ -160,6 +160,8 @@ class CurrentWD(QWidget):
         if self.mode == "week" and self.check_week(forward):
             self.curr_date += datetime.timedelta(weeks=(1 if forward else -1))
 
+        # print(self.curr_date)
+
         # self.graph.set_path(self.curr_date)
         self.check_mode(self.mode)
         self.graph.change_by_one(self.mode, self.curr_date)
@@ -169,7 +171,7 @@ class CurrentWD(QWidget):
         :param forward: whether we are moving forwards or backwards one day
         :return: whether the day exists in a data file
         """
-        path = self.graph.set_path(self.curr_date)
+        path = self.graph.set_path(self.curr_date + datetime.timedelta(days=-1))
         if forward and self.curr_date == datetime.date.today():
             return False
         if not forward and not path:
@@ -211,10 +213,11 @@ class CurrentGraph(QDialog):
 
         self.apps = QScrollArea()
         self.apps.setFixedHeight(300)
-        self.add_apps()
         self.days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
         self.hours = range(24)
         self.mode_var = "day"
+
+        self.add_apps()
 
         self.figure = Figure()
         self.figure.set_figwidth(2)
@@ -242,7 +245,9 @@ class CurrentGraph(QDialog):
         v_apps = QVBoxLayout()
         for x in names:
             if not x == "ShellExperienceHost":
-                v_apps.addWidget(AppInfo(self, x, self.width, self.curr_date.weekday()))
+                a = AppInfo(self, x, self.width, self.curr_date, self.mode_var)
+                #a.set_path(self.curr_date)
+                v_apps.addWidget(a)
         if self.name not in names:
             self.name = "RunningTotal"
             self.data = graph.TotalCreator(self.name)
@@ -293,7 +298,7 @@ class CurrentGraph(QDialog):
         Sets a new data path according to the given date
         """
         week_date = date + datetime.timedelta(days=-date.weekday(), weeks=0)
-        print(week_date)
+        # print(week_date)
         return self.data.set_path(week_date)
 
     def change_data_name(self, name):
@@ -310,12 +315,13 @@ class AppInfo(QWidget):
     """
     Contains a single app's name and the time spent on the app
     """
-    def __init__(self, parent, name, width, day):
+    def __init__(self, parent, name, width, day, mode):
         super().__init__()
         self.parent = parent
         self.name = name
         self.data = graph.TotalCreator(name)
         self.width = int(width / 2.2)
+        self.mode = mode
 
         h = QHBoxLayout()
         app = QPushButton(name)
@@ -326,7 +332,7 @@ class AppInfo(QWidget):
                           "background-color: #bef3f6;")
         app.clicked.connect(self.change_graph)
 
-        total_time = int(np.sum(self.data.get_day_total(day)))
+        total_time = int(np.sum(self.data.get_day_total(day.weekday())))
         time = QPushButton(str(total_time))
         time.setFont(QFont('Agenda One', 12))
         time.setMinimumWidth(self.width)
@@ -344,6 +350,8 @@ class AppInfo(QWidget):
         Changes what app the graph shows
         """
         self.parent.change_data_name(self.name)
+
+
 
 """
 if __name__ == "__main__":

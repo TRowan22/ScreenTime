@@ -99,7 +99,9 @@ class TotalCreator:
         :param curr_week: the week file we want to find
         :return: Whether the file currently exists
         """
+
         path = jsutils.JsonUtils.convert_file(curr_week)
+        print(curr_week, os.path.isfile(path))
         if os.path.isfile(path):
             self.path = path
             self.data = jsutils.JsonUtils.read(self.path)
