@@ -441,3 +441,5 @@ class TestApp(unittest.TestCase):
         t.set_path("tester_file")
         self.assertEqual(list(t.get_names()), ["RunningTotal", "Firefox"])
         os.remove(self.new_path)
+
+

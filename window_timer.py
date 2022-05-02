@@ -87,12 +87,12 @@ class MainTimer:
                 self.timer.update("RunningTotal")
 
     def update(self):
-        while True:
-            self.get_current_window()
+        self.timer.send_to_json()
 
 
 def main_func():
     m = MainTimer()
+    m.update()
 
     start_time = datetime.datetime.now()
     while True:
