@@ -345,6 +345,7 @@ class AppInfo(QWidget):
         time.setFlat(True)
         time.setStyleSheet("text-align: right;"
                            "background-color: #bef3f6;")
+        time.clicked.connect(self.change_graph)
 
         h.addWidget(app)
         h.addWidget(time)
