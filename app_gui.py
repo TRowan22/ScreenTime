@@ -1,16 +1,13 @@
-import time
-
-import window_timer
-import sys, time
+import sys
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas)
 from matplotlib.figure import Figure
 import datetime
 import numpy as np
 import graphs as graph
-from PyQt5.QtWidgets import QVBoxLayout, QMainWindow, QApplication, QLabel, QWidget, \
-    QPushButton, QLineEdit, QHBoxLayout, QDockWidget, QSizePolicy, QDialog, QScrollArea, QGroupBox
-from PyQt5.QtGui import QPixmap, QPalette, QIcon, QFont
+from PyQt5.QtWidgets import QVBoxLayout, QApplication, QLabel, QWidget, \
+    QPushButton, QHBoxLayout, QDialog, QScrollArea, QGroupBox
+from PyQt5.QtGui import QFont
 from PyQt5.QtCore import *
 
 
@@ -160,9 +157,6 @@ class CurrentWD(QWidget):
         if self.mode == "week" and self.check_week(forward):
             self.curr_date += datetime.timedelta(weeks=(1 if forward else -1))
 
-        # print(self.curr_date)
-
-        # self.graph.set_path(self.curr_date)
         self.check_mode(self.mode)
         self.graph.change_by_one(self.mode, self.curr_date)
 
@@ -298,7 +292,6 @@ class CurrentGraph(QDialog):
         Sets a new data path according to the given date
         """
         week_date = date + datetime.timedelta(days=-date.weekday(), weeks=0)
-        # print(week_date)
         return self.data.set_path(week_date)
 
     def change_data_name(self, name):

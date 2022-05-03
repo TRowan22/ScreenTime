@@ -4,7 +4,7 @@ import psutil as util
 import datetime
 import jsonutils as jsutils
 import os
-import threading, time
+import time
 
 
 class TimesStruct:
@@ -79,8 +79,6 @@ class MainTimer:
             if p.pid == fore_proc:
                 name = p.name()[0].upper() + p.name()[1:-4]
                 self.timer.update(name)
-                #print(datetime.datetime.now().second)
-                #print(name)
                 self.timer.update("RunningTotal")
 
     def update(self):

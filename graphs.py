@@ -1,11 +1,10 @@
 """
 Working on it
 """
-import matplotlib.pyplot as plt
 import jsonutils as jsutils
 import numpy as np
 import os
-import datetime
+
 
 class TotalCreator:
     """

@@ -2,7 +2,6 @@ import threading
 
 import app_gui as gui
 import time
-import os
 import window_timer
 from threading import Thread
 
