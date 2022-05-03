@@ -57,6 +57,9 @@ class TimesStruct:
         self.times.update({name: new_dict})
 
     def send_to_json(self):
+        """
+        Updates the current JSON file with modified data
+        """
         jsutils.JsonUtils.write(self.path, self.times)
 
 
@@ -70,9 +73,7 @@ class MainTimer:
     def get_current_window(self):
         """
         Gets the current window, updates if the proper tick
-        :return:
         """
-
         fore_proc = proc.GetWindowThreadProcessId(gui.GetForegroundWindow())[1]
         for p in util.process_iter(['pid', 'name']):
             if p.pid == fore_proc:
