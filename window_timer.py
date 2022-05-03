@@ -66,10 +66,6 @@ class MainTimer:
 
     def __init__(self):
         self.timer = TimesStruct()
-        self.currentDay = datetime.datetime.today().weekday()
-        self.startSecond = datetime.datetime.now().second
-        self.corners = {1080: (1536, 824), 1200: (1536, 920)}  # which tuple of pixels corresponds to a full screen window
-        # each display size - 1440p, 4K, ultrawide need to be added
 
     def get_current_window(self):
         """
@@ -82,11 +78,14 @@ class MainTimer:
             if p.pid == fore_proc:
                 name = p.name()[0].upper() + p.name()[1:-4]
                 self.timer.update(name)
-                print(datetime.datetime.now().second)
-                print(name)
+                #print(datetime.datetime.now().second)
+                #print(name)
                 self.timer.update("RunningTotal")
 
     def update(self):
+        """
+        Updates the json file the timer currently points to.
+        """
         self.timer.send_to_json()
 
 

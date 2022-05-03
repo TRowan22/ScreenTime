@@ -264,6 +264,7 @@ class CurrentGraph(QDialog):
         """
 
         self.mode_var = mode
+        self.add_apps()
         self.figure.clear()
         ax = self.figure.add_subplot(111)
 
