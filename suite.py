@@ -15,6 +15,11 @@ def suite():
     suite.addTest(TestApp('test_get_day_total'))
     suite.addTest(TestApp('test_get_week_total'))
     suite.addTest(TestApp('test_set_path'))
+    suite.addTest(TestApp('test_change_label'))
+    suite.addTest(TestApp('test_change_one_day'))
+    suite.addTest(TestApp('test_change_one_week'))
+    suite.addTest(TestApp('test_check_mode'))
+
     return suite
 
 

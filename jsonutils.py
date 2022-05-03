@@ -20,7 +20,7 @@ class JsonUtils:
         """
         file = str(current) + ".json"
         path = os.path.dirname(os.path.realpath(__file__))
-        return rf"{path}\test_data\{file}"
+        return rf"{path}\data\{file}"
 
     @staticmethod
     def write(path, data):

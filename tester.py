@@ -1,5 +1,6 @@
 import unittest
 
+import gui_methods
 import jsonutils
 import datetime
 import window_timer as wt
@@ -442,4 +443,38 @@ class TestApp(unittest.TestCase):
         self.assertEqual(list(t.get_names()), ["RunningTotal", "Firefox"])
         os.remove(self.new_path)
 
+    # GUI Graph and AppInfo set path already tested in test_set_path
 
+    def test_change_label(self):
+        g = gui_methods.GuiMethods()
+        g.change_label("week")
+        temp_week = g.curr_date + datetime.timedelta(days=-g.curr_date.weekday(), weeks=0)
+        self.assertEqual(g.curr_date, temp_week)
+        g.change_label("day")
+        self.assertEqual(g.curr_date, datetime.date.today())
+
+    def test_change_one_day(self):
+        g = gui_methods.GuiMethods()
+        base_date = g.curr_date
+        g.change_by_one(False)
+        self.assertEqual(g.curr_date, base_date + datetime.timedelta(days=-1))
+        g.change_by_one(True)
+        self.assertEqual(base_date, g.curr_date)
+        g.change_by_one(True)
+        self.assertEqual(g.curr_date, base_date + datetime.timedelta(days=1))
+
+    def test_change_one_week(self):
+        g = gui_methods.GuiMethods()
+        base_date = g.curr_date
+        g.mode = ("week")
+        g.change_by_one(False)
+        self.assertEqual(g.curr_date, base_date + datetime.timedelta(weeks=-1))
+        g.change_by_one(True)
+        self.assertEqual(base_date, g.curr_date)
+        g.change_by_one(True)
+        self.assertEqual(g.curr_date, base_date + datetime.timedelta(weeks=1))
+
+    def test_check_mode(self):
+        g = gui_methods.GuiMethods()
+        self.assertEqual(g.check_mode("day"), g.curr_date.strftime("%A, %B %d, %Y"))
+        self.assertEqual(g.check_mode("week"), f'Week of Monday, {g.curr_date.strftime("%B %d, %Y")}')
